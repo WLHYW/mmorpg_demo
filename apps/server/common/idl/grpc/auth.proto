@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package auth;
+
+service Auth {
+  rpc checkToken(CheckTokenReq) returns (CheckTokenRes) {}
+}
+
+message CheckTokenReq {
+  string token = 1;
+}
+
+message CheckTokenRes {
+  CheckTokenResData data = 1;
+  optional string error = 2;
+}
+
+message CheckTokenResData {
+  string account = 2;
+}

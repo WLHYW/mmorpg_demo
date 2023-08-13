@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package game;
+
+// 进入游戏
+message EnterGameReq {
+  string token = 1;
+}
+
+message EnterGameRes {
+  EnterGameResData data = 1;
+  optional string error = 2;
+}
+
+message EnterGameResData {
+  string account = 1;
+}
+
+// 获取当前玩家的角色列表
+message ListActorReq {
+
+}
+
+message ListActorRes {
+  ListActorResData data = 1;
+  optional string error = 2;
+}
+
+message ListActorResData{
+  repeated IActor actors = 1;
+}
+
+// 创建角色
+message CreateActorReq{
+  string nickname = 1;
+}
+
+message CreateActorRes{
+  CreateActorResData data = 1;
+  optional string error = 2;
+}
+
+message CreateActorResData{
+
+}
+
+// 进入场景
+message EnterSceneReq {
+  int32 actorId = 1;
+}
+
+message EnterSceneRes {
+  EnterSceneResData data = 1;
+  optional string error = 2;
+}
+
+message EnterSceneResData {
+  int32 sceneId = 1;
+}
+
+// 切换场景
+message ChangeSceneReq {
+  int32 sceneId = 1;
+}
+
+message ChangeSceneRes {
+  ChangeSceneResData data = 1;
+  optional string error = 2;
+}
+
+message ChangeSceneResData {
+}
+
+// 创建副本
+message CreateReplicationReq {
+  int32 replicationType = 1;
+}
+
+message CreateReplicationRes {
+  CreateReplicationResData data = 1;
+  optional string error = 2;
+}
+
+message CreateReplicationResData{
+}
+
+// 离开副本
+message LeaveReplicationReq {
+
+}
+
+message LeaveReplicationRes {
+  LeaveReplicationReqData data = 1;
+  optional string error = 2;
+}
+
+message LeaveReplicationReqData {
+  int32 sceneId = 1;
+}
+
+message IActor{
+  int32 id = 1;
+  string nickname = 2;
+  float posX = 3;
+  float posY = 4;
+  int32 type = 5;
+  string account = 6;
+  int32 sceneId = 7;
+}
+
+// 客户端操作同步
+message InputFromClient {
+  int32 id = 1;
+  float directionX = 2;
+  float directionY = 3;
+  float dt = 4;
+}
+
+message State {
+  repeated IActor actors = 1;
+}
+
+// 服务端状态同步
+message StateFromServer {
+  State state = 1;
+  repeated InputFromClient input = 2;
+}
+
