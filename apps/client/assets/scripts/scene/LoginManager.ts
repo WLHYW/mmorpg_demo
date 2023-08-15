@@ -1,5 +1,11 @@
 import { _decorator, Component, EditBox, Node } from 'cc';
+import Crypt from 'jsencrypt'
+import { PublicKey } from '../common';
 const { ccclass, property } = _decorator;
+
+const crypt = new Crypt()
+
+crypt.setKey(PublicKey)
 
 @ccclass('LoginManager')
 export class LoginManager extends Component {
@@ -12,8 +18,8 @@ export class LoginManager extends Component {
     }
 
     async register() {
-        const account = this.account.string;
-        const password = this.password.string;
+        const account = crypt.encrypt(this.account.string);
+        const password = crypt.encrypt(this.password.string);
 
         console.log("account", account);
         console.log("password", password);
