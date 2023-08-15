@@ -35,7 +35,29 @@ export class LoginManager extends Component {
               }),
         }).then((response) => response.json());
 
-            console.log("res",res);
+        console.log("res",res);
+    }
+    
+    async login(){
+        const account = crypt.encrypt(this.account.string);
+        const password = crypt.encrypt(this.password.string);
+
+        console.log("account", account);
+        console.log("password", password);
+
+        const res = await fetch("http://localhost:3000/login",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                account,
+                password,
+              }),
+        }).then((response) => response.json());
+
+        console.log("res",res);
+
     }
 }
 
