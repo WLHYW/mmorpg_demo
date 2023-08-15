@@ -5,7 +5,7 @@ export const createDBConnection = () => {
     const connection = mysql.createConnection({
       host: "localhost",
       user: "root",
-      password: "123456",
+      password: "MysqlRoot",
       database: "mmodb",
     });
     connection.connect((e) => {

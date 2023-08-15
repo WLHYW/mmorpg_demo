@@ -1,9 +1,22 @@
 import express from "express";
 import cors from "cors";
+import dayjs from "dayjs";
+import mysql from "mysql";
+import { createHash } from "crypto";
 import bodyParser from "body-parser";
 // @ts-ignore
 import Crypt from "node-jsencrypt";
 import { PrivateKey } from "../common";
+
+const connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'MysqlRoot',
+  database : 'mmodb'
+});
+ 
+connection.connect();
+
 const crypt = new Crypt()
 
 crypt.setKey(PrivateKey)
@@ -22,6 +35,21 @@ app.post('/register', function (req, res) {
 
     console.log("account",account);
     console.log("password",password);
+
+    const hash = createHash('md5');
+    hash.update(password);
+    const passwordHash = hash.digest('hex')
+
+    connection.query('insert into user (account, password, created_time) VALUES (?,?,?)',
+     [account, passwordHash, dayjs().format('YYYY-MM-DD HH:mm:ss')], 
+     function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          return
+        }
+
+        console.log(results);
+    });
 
     res.json({});
   })
