@@ -1,6 +1,7 @@
 import { _decorator, Component, EditBox, Node } from 'cc';
 import Crypt from 'jsencrypt'
-import { PublicKey } from '../common';
+import { PublicKey, RpcFunc } from '../common';
+import NetworkManager from '../global/NetworkManager';
 const { ccclass, property } = _decorator;
 
 const crypt = new Crypt()
@@ -58,6 +59,16 @@ export class LoginManager extends Component {
 
         console.log("res",res);
 
+        this.connect(res.token)
+
+    }
+    
+    async connect(token: string){
+      await NetworkManager.Instance.connect();
+      const res = await NetworkManager.Instance.call(RpcFunc.enterGame, {
+        token,
+      });
+      console.log("connect", res)
     }
 }
 
