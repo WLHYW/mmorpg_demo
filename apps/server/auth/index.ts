@@ -7,7 +7,8 @@ import bodyParser from "body-parser";
 import Crypt from "node-jsencrypt";
 import { createHash } from "crypto";
 import { v4 as uuidv4 } from 'uuid';
-import { PrivateKey } from "../common";
+import * as grpc from "@grpc/grpc-js";
+import { AuthService, CheckTokenRes, CheckTokenResData, PrivateKey } from "../common";
 
 const cache = new Map()
 
@@ -97,3 +98,25 @@ app.listen(3000)
 
 
 console.log("auth 服务");
+
+
+const server = new grpc.Server();
+server.addService(AuthService, {
+  checkToken(call: any, callback: any) {
+    const token = call.request.getToken();
+    const res = new CheckTokenRes();
+    if (cache.has(token)) {
+        const data = new CheckTokenResData();
+        data.setAccount(cache.get(token));
+        res.setData(data);
+    } else {
+      res.setError("token not exist");
+    }
+    callback(null, res);
+  },
+});
+
+server.bindAsync("localhost:3333", grpc.ServerCredentials.createInsecure(), () => {
+  server.start();
+  console.log("RPC服务启动");
+});
