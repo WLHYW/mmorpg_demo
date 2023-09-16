@@ -52,7 +52,12 @@ export default class NetworkManager extends Singleton {
       this.ws.onmessage = (e) => {
         try {
           // TODO解析data和name
-          const { name, data } = JSON.parse(e.data);
+          const ta = new Uint8Array(e.data);
+          const name = ta[0];
+          const path = getProtoPathByRpcFunc(name, "res")
+          const coder = protoRoot.lookup(path);
+          const data = coder.decode(ta.slice(1))
+          // const { name, data } = JSON.parse(e.data);
           try {
             if (this.maps.has(name) && this.maps.get(name).length) {
               this.maps.get(name).forEach(({ cb, ctx }) => cb.call(ctx, data));
@@ -97,12 +102,17 @@ export default class NetworkManager extends Singleton {
   }
 
   async send(name: RpcFunc, data: IData) {
-    // TODO
-    const obj = {
-      name,
-      data,
-    };
-    this.ws.send(JSON.stringify(obj));
+    const path = getProtoPathByRpcFunc(name, "req");
+    const coder = protoRoot.lookupType(path);
+    const ta = coder.encode(data).finish();
+    const ab = new ArrayBuffer(ta.length + 1);
+    const view = new DataView(ab);
+    let index = 0;
+    view.setUint8(index++, name);
+    for (let i = 0; i < ta.byteLength; i++) {
+      view.setUint8(index++, ta[i]);
+    }
+    this.ws.send(view.buffer);
   }
 
   listen(name: RpcFunc, cb: (args: any) => void, ctx: unknown) {
